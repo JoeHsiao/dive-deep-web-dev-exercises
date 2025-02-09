@@ -3,7 +3,25 @@ import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 import personService from './services/persons'
-import axios from 'axios'
+
+const Notification = ({ message, color }) => {
+  if (!message)
+    return
+  const notificationStyle = {
+    color: color,
+    backgroundColor: 'lightgray',
+    padding: '15px',
+    border: `3px solid, ${color}`,
+    borderRadius: "5px"
+  }
+  return (
+    <div>
+      <h3 style={notificationStyle}>
+        {message}
+      </h3>
+    </div>
+  )
+}
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,6 +29,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const [notificationColor, setNotificationColor] = useState('green')
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -34,6 +54,17 @@ const App = () => {
       .then(reponse => {
         setPersons(persons.map(p => p.id === personWithNewNumber.id ? personWithNewNumber : p))
         clearAdditionFields()
+        setNotificationColor('green')
+        setNotificationMessage(`Updated ${newName}'s number to ${newNumber}`)
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 5000)
+      })
+      .catch(error => {
+        setNotificationColor('red')
+        setNotificationMessage(`Information of ${newName} has already been removed from server`)
+        setPersons(persons.filter(p => p.id != person.id))
+        clearAdditionFields()
       })
   }
 
@@ -55,6 +86,10 @@ const App = () => {
       .then(response => {
         setPersons(persons.concat(response.data))
         clearAdditionFields()
+        setNotificationMessage(`Added ${newName}`)
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 5000)
       })
   }
 
@@ -85,6 +120,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} color={notificationColor} />
       <Filter keyword={filterName} handleFilterChange={handleFilterChange} />
       <div>
         Filtered result:
