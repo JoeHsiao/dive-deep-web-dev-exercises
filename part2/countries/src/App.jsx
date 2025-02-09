@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import countriesService from './services/countries'
 import QueryResults from './components/QueryResults'
+import shortId from 'shortid'
 
 const App = () => {
   const [query, setQuery] = useState(null)
@@ -11,7 +12,6 @@ const App = () => {
       .getAll()
       .then(response => response.data)
       .then(data => {
-        console.log(data)
         setCountries(data)
       })
   }, [])
@@ -22,7 +22,7 @@ const App = () => {
 
   return (
     <>
-      find countries: <input onChange={handleQueryChange} />
+      find countries: <input id={shortId.generate()} onChange={handleQueryChange} />
       <div>
         <QueryResults query={query} countries={countries} />
       </div>
